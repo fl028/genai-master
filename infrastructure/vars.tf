@@ -24,5 +24,5 @@ variable "private_key_filename" {
 variable "PROJECT_ROOT_PATH" {
   description = "Path to the project root directory"
   type        = string
-  default     = "C:\\Users\\Florian\\Documents\\Development\\terraform\\infrastructure"
+  default     = "C:\\Users\\Florian\\Documents\\Development\\genai-master"
 }

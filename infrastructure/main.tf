@@ -228,7 +228,8 @@ data "template_file" "ssh_config" {
     Host vm1
         HostName ${azurerm_linux_virtual_machine.vm1.public_ip_address}
         User azureadmin
-        IdentityFile ${var.PROJECT_ROOT_PATH}/${var.private_key_filename}
+        Port 22
+        IdentityFile ${var.PROJECT_ROOT_PATH}\\infrastructure\\${var.private_key_filename}
   EOF
 }
 
