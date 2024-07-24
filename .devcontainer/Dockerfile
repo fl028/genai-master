@@ -19,3 +19,9 @@ RUN apt-get install -y terraform
 
 # install az cli
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+
+# set envs (Azure Service Principal)
+ENV ARM_CLIENT_ID "..."
+ENV ARM_CLIENT_SECRET "..."
+ENV ARM_SUBSCRIPTION_ID "..."
+ENV ARM_TENANT_ID "..."

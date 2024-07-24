@@ -19,7 +19,15 @@ The repository uses the concept of Visual Studio Code Dev Containers for develop
 
 ### Setup Base Container
 
-1. **Reopen in Container**:
+1. **Azure Service Principal**: 
+    - To interact with Azure resources programmatically, you'll need to create an Azure Service Principal. This is used to authenticate and authorize the Terraform deployment.
+    - Set environment variables in the [Dockerfile](.devcontainer/Dockerfile#L23-L27):
+      - `ENV ARM_CLIENT_ID "..."`
+      - `ENV ARM_CLIENT_SECRET "..."`
+      - `ENV ARM_SUBSCRIPTION_ID "..."`
+      - `ENV ARM_TENANT_ID "..."`
+
+2. **Reopen in Container**:
    - Open the Command Palette: select: `Dev Containers: Reopen in Container`
    - VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
 
@@ -27,21 +35,10 @@ The repository uses the concept of Visual Studio Code Dev Containers for develop
 
 Use Terraform to set up the required Azure infrastructure.
 
-1. **Azure Service Principal**: 
-    - To interact with Azure resources programmatically, you'll need to create an Azure Service Principal. This is used to authenticate and authorize the Terraform deployment.
-    - Set environment variables in the devcontainer:
-        - `export ARM_CLIENT_ID="..."`
-        - `export ARM_CLIENT_SECRET="..."`
-        - `export ARM_SUBSCRIPTION_ID="..."`
-        - `export ARM_TENANT_ID=".."`
-2. **Initialize Terraform**:
-   - Navigate to the directory containing the Terraform configuration files (`cd infrastructure`).
-   - Run `terraform init` to initialize the configuration.
-3. **Apply Terraform Configuration**:
-    - Run `terraform plan` to see the plan.
-    - Run `terraform apply --auto-approve` to create the Azure resources.
-    - Run `terraform destroy --auto-approve` to delete the Azure resources (When you are done).
-
+1. **Apply Terraform Configuration**:
+   - Navigate to the directory containing the Terraform configuration files [cd infrastructure](infrastructure/).
+   - Run `terraform apply --auto-approve` to create the Azure resources.
+   - Run `terraform destroy --auto-approve` to delete the Azure resources (When you are done).
 
 ### Connect to Azure Infrastructure
 
