@@ -1,7 +1,4 @@
 {
-    "api-user": "...",
-    "api-password": "...",
-    "api-url": "...",
     "db-user": "mysqladmin",
     "db-password": "...",
     "db-host": "genai-master-db.mysql.database.azure.com",
