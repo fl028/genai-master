@@ -1,0 +1,20 @@
+{
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "runArgs": [
+        "--network",
+        "ollama_network",
+        "--name",
+        "devcontainer_ollama"
+    ],
+    "postStartCommand": "ollama serve & sleep 5 && ollama run llama3",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "remote.autoForwardPorts": false
+            }
+        }
+    }
+}

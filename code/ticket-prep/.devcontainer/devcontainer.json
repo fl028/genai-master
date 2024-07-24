@@ -4,6 +4,8 @@
 		"context": ".."
 	},
 	"runArgs": [
+		"--network",
+		"ollama_network",
 		"--name",
 		"devcontainer_ticket-prep"
 	],
@@ -14,5 +16,6 @@
 			]
 		}
 	},
+	"initializeCommand": "docker network create ollama_network",
 	"postCreateCommand": "python3 -m venv _venv && . _venv/bin/activate && pip install -r requirements.txt"
 }
