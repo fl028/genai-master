@@ -1,0 +1,21 @@
+# generated ssh keys
+*.pem
+
+# generated vs code config
+vscode_ssh_config
+
+# my notes
+commands.md
+
+# config files
+config.json
+
+#tf files
+*.backup
+*.tfstate
+*.hcl
+.terraform/
+*.info
+
+# py 
+_venv/
