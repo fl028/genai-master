@@ -52,8 +52,11 @@ Use Terraform to set up the required Azure infrastructure.
    - If we are successfully connected to the azure vm we can test the db connection and create the tables.
    - Run `terraform output -raw mysql_password` in the terraform dev container to retrieve the db-password.
    - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' -e "SHOW DATABASES;"` to test db connection
-   - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' -D data -e "CREATE TABLE tickets (id INT(11) PRIMARY KEY, sap_ticketstatus VARCHAR(50), sap_ticketstatus_t VARCHAR(50), sap_ticketno VARCHAR(50), cdl_text VARCHAR(250), guid VARCHAR(50), processtype VARCHAR(50), action VARCHAR(50), company INT(11), reporter INT(11), supportteam INT(11), editor INT(11), status VARCHAR(50), statustxt VARCHAR(50), category VARCHAR(50), component VARCHAR(50), ibase INT(11), sysrole VARCHAR(10), priority INT(11), title VARCHAR(255), text TEXT, text2 VARCHAR(50), security VARCHAR(50), postpuntil VARCHAR(50), linkid VARCHAR(50), cdlid VARCHAR(50), optid VARCHAR(50), psp VARCHAR(50), units VARCHAR(50), type VARCHAR(50));"` to create the first table.
+   - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' -D data -e "CREATE TABLE tickets (id INT(11) PRIMARY KEY, sap_ticketstatus VARCHAR(50), sap_ticketstatus_t VARCHAR(50), sap_ticketno VARCHAR(50), cdl_text VARCHAR(250), guid VARCHAR(50), processtype VARCHAR(50), action VARCHAR(50), company INT(11), reporter INT(11), supportteam INT(11), editor INT(11), status VARCHAR(50), statustxt VARCHAR(50), category VARCHAR(50), component VARCHAR(50), ibase INT(11), sysrole VARCHAR(10), priority INT(11), title VARCHAR(255), text TEXT, text2 VARCHAR(50), security VARCHAR(50), postpuntil VARCHAR(50), linkid VARCHAR(50), cdlid VARCHAR(50), optid VARCHAR(50), psp VARCHAR(50), units VARCHAR(50), type VARCHAR(50));"` to create the table.
+   - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' -D data -e "CREATE TABLE tickets_texts (id INT(11) PRIMARY KEY, text TEXT);"` to create the table.
 
+3. **Clone repo**
+- Run `git clone https://github.com/fl028/genai-master` to get the source code.
 
 ## Finetune a LLM with custom data 
 
@@ -63,16 +66,13 @@ We now use the generated infrastructure to fine-tune a language model with our o
 
 The raw data is transferred from the ticket system to the database via a REST API.
 
-1. **Clone repo**
-- Run `git clone https://github.com/fl028/genai-master` to get the source code.
-
-2. **Reopen in Container**:
+1. **Reopen in Container**:
 - The architecture of the vs code dev container is also used in the phases. So we open the first folder in the container. Only now we are on the azure vm.
 - Open the folder: `~/genai-master/code/ticket-transfer`
 - Open the Command Palette: select: `Dev Containers: Reopen in Container`
 - VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
 
-3. **Setup config file**:
+2. **Setup config file**:
 - To get access to the ticket api and db we have to prepare a [config.json](code\ticket-transfer\config.json)
 - Fill the following content: `{
     "api-user": "...",
@@ -84,7 +84,7 @@ The raw data is transferred from the ticket system to the database via a REST AP
     "db-database": "data"
 }`
 
-4. **Run python scripts**:
+3. **Run python scripts**:
 - Run `check-tickets.py` to check the db (table: tickets) contents.
 - Run `get-tickets.py` to fill the db (table: tickets).
 
@@ -93,4 +93,21 @@ The raw data is transferred from the ticket system to the database via a REST AP
 
 The raw data in the database can now be processed further. To do this, we need to clean up the ticket texts and convert them into a suitable format. The results are also saved in the database.
 
-1. **TODO**
+1. **Reopen in Container**:
+- The architecture of the vs code dev container is also used in the phases. So we open the first folder in the container. Only now we are on the azure vm.
+- Open the folder: `~/genai-master/code/ticket-prep`
+- Open the Command Palette: select: `Dev Containers: Reopen in Container`
+- VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
+
+2. **Setup config file**:
+- To get access to the ticket api and db we have to prepare a [config.json](code\ticket-prep\config.json)
+- Fill the following content: `{
+    "db-user": "mysqladmin",
+    "db-password": "...",
+    "db-host": "genai-master-db.mysql.database.azure.com",
+    "db-database": "data"
+}`
+
+3. **Run python scripts**:
+- Run `check-tickets.py` to check the db (table: tickets_texts) contents.
+- Run `cleanup-tickets.py` to cleanup the tickets db (table: tickets_texts) contents.
