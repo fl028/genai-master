@@ -112,3 +112,7 @@ The raw data in the database can now be processed further. To do this, we need t
 3. **Run python scripts**:
 - Run `python check-tickets.py` to check the db (table: tickets_texts) contents.
 - Run `python cleanup-tickets.py` to cleanup the tickets db (table: tickets_texts) contents.
+
+### Ollama hosting
+
+1. **TODO**:

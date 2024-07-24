@@ -150,7 +150,7 @@ resource "azurerm_linux_virtual_machine" "vm1" {
   location               = azurerm_resource_group.rg.location
   resource_group_name    = azurerm_resource_group.rg.name
   network_interface_ids  = [azurerm_network_interface.nic1.id] 
-  size                   = "Standard_B2s"          
+  size                   = "Standard_B4ms"          
 
   custom_data = data.template_cloudinit_config.vm.rendered 
 
@@ -229,7 +229,7 @@ data "template_file" "ssh_config" {
         HostName ${azurerm_linux_virtual_machine.vm1.public_ip_address}
         User azureadmin
         Port 22
-        IdentityFile ${var.PROJECT_ROOT_PATH}\\infrastructure\\${var.private_key_filename}
+        IdentityFile ${var.PROJECT_ROOT_PATH}\infrastructure\${var.private_key_filename}
   EOF
 }
 
