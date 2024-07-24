@@ -72,14 +72,9 @@ The raw data is transferred from the ticket system to the database via a REST AP
 - Open the Command Palette: select: `Dev Containers: Reopen in Container`
 - VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
 
-3. **Setup venv**:
- - Run `python3 -m venv _venv` to create a virtual environment.
- - Run `source _venv/bin/activate` to activate the virtual environment.
- - Run `pip install -r requirements.txt` to install all libs into the virtual environment.
-
-4. **Setup config file**:
-- To get access to the ticket api and db we have to prepare a config.json
-- Create with the following content: `{
+3. **Setup config file**:
+- To get access to the ticket api and db we have to prepare a [config.json](code\ticket-transfer\config.json)
+- Fill the following content: `{
     "api-user": "...",
     "api-password": "...",
     "api-url": "...",

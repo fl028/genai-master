@@ -7,9 +7,6 @@ vscode_ssh_config
 # my notes
 commands.md
 
-# config files
-config.json
-
 #tf files
 *.backup
 *.tfstate
