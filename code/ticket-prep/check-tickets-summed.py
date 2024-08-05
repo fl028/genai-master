@@ -42,7 +42,7 @@ class DB:
                 cursor = self.connection.cursor()
 
                 query = """
-                SELECT COUNT(*) FROM tickets_texts;
+                SELECT COUNT(*) FROM tickets_summary;
                 """
 
                 # Execute the query
@@ -62,7 +62,7 @@ class DB:
             print("No connection to the database.")
             return None
         
-        query = "SELECT id, text FROM tickets_texts"
+        query = "SELECT id, question, answer FROM tickets_summary"
         
         try:
             cursor = self.connection.cursor()

@@ -110,9 +110,17 @@ The raw data in the database can now be processed further. To do this, we need t
 }`
 
 3. **Run python scripts**:
-- Run `python check-tickets.py` to check the db (table: tickets_texts) contents.
+- Run `python check-tickets-cleaned.py` to check the db (table: tickets_texts) contents.
 - Run `python cleanup-tickets.py` to cleanup the tickets db (table: tickets_texts) contents.
 
 ### Ollama hosting
 
-1. **TODO**:
+1. **Reopen in Container**:
+- Open the folder: `~/genai-master/code/ticket-ollama`
+- Open the Command Palette: select: `Dev Containers: Reopen in Container`
+- VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
+- In this container a local llm is hosted to summarize the incident data
+
+2. **Run python scripts**:
+- Run `python check-tickets-summed.py` to check the db (table: tickets_texts) contents.
+- Run `python sum-tickets.py` to sum the tickets db (table: tickets_summary) contents.
