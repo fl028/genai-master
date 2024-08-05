@@ -4,6 +4,7 @@
         "context": ".."
     },
     "runArgs": [
+        "--gpus=all",
         "--network",
         "ollama_network",
         "--name",

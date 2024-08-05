@@ -115,12 +115,21 @@ The raw data in the database can now be processed further. To do this, we need t
 
 ### Ollama hosting
 
-1. **Reopen in Container**:
+1. **Setup VM with GPU**:
+- set a ressource lock on the db (to prevent deletion)
+- in the main.tf set  size  = "Standard_NV12ads_A10_v5" 
+- redeploy terraform infrastructure
+- install NVIDIA drivers
+- check gpu drivers: nvidia-smi or lspci | grep -i nvidia
+- install NVIDIA Container Toolkit
+- check gpu in container: docker run --gpus all nvcr.io/nvidia/k8s/cuda-sample:nbody nbody -gpu -benchmark
+
+2. **Reopen in Container**:
 - Open the folder: `~/genai-master/code/ticket-ollama`
 - Open the Command Palette: select: `Dev Containers: Reopen in Container`
 - VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
 - In this container a local llm is hosted to summarize the incident data
 
-2. **Run python scripts**:
+3. **Run python scripts**:
 - Run `python check-tickets-summed.py` to check the db (table: tickets_texts) contents.
 - Run `python sum-tickets.py` to sum the tickets db (table: tickets_summary) contents.
