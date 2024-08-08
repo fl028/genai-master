@@ -161,7 +161,7 @@ if __name__ == "__main__":
 
                     body_question = {
                         "model": "llama3.1",
-                        "prompt": "The following text is an it incident ticket. I would like you to summarize the ticket text for me in an abstract form (only the incident) so that the inicdent situation can also be applied to other IT incidents. \n\n Maximum four sentences. Only the plain summary. Start without any phrase at the begnning and ending. \n\n" + cleaned_text,
+                        "prompt": "The following text is an it incident ticket. I would like you to summarize the ticket text for me in an abstract form (only the incident) so that the incident situation can also be applied to other IT incidents. \n\n Maximum four sentences. Only the plain summary. Start without any phrase at the begnning and ending. \n\n" + cleaned_text,
                         "stream": False
                     }
 
@@ -177,7 +177,7 @@ if __name__ == "__main__":
 
 
                     body_answer = {
-                        "model": "llama3",
+                        "model": "llama3.1",
                         "prompt": "The following text is an it incident ticket. I would like you to summarize the ticket text for me in an abstract form (only the solution) so that the solution can also be applied to other IT incidents. \n\n Maximum four sentences. Only the plain summary. Start without any phrase at the begnning and ending. \n\n" + cleaned_text,
                         "stream": False
                     }

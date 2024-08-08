@@ -119,9 +119,9 @@ The raw data in the database can now be processed further. To do this, we need t
 - set a ressource lock on the db (to prevent deletion)
 - in the main.tf set  size  = "Standard_NV12ads_A10_v5" 
 - redeploy terraform infrastructure
-- install NVIDIA drivers
+- install NVIDIA drivers and CUDA toolkit (https://learn.microsoft.com/en-us/azure/virtual-machines/linux/n-series-driver-setup)
 - check gpu drivers: nvidia-smi or lspci | grep -i nvidia
-- install NVIDIA Container Toolkit
+- install NVIDIA Container Toolkit (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt)
 - check gpu in container: docker run --gpus all nvcr.io/nvidia/k8s/cuda-sample:nbody nbody -gpu -benchmark
 
 2. **Reopen in Container**:
@@ -133,3 +133,15 @@ The raw data in the database can now be processed further. To do this, we need t
 3. **Run python scripts**:
 - Run `python check-tickets-summed.py` to check the db (table: tickets_texts) contents.
 - Run `python sum-tickets.py` to sum the tickets db (table: tickets_summary) contents.
+
+### Traning
+
+1. **Reopen in Container**:
+- The architecture of the vs code dev container is also used in the phases. So we open the first folder in the container. Only now we are on the azure vm.
+- Open the folder: `~/genai-master/code/train-model`
+- Open the Command Palette: select: `Dev Containers: Reopen in Container`
+- VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
+
+2. **Run python scripts**:
+- Place the json file next to the python script (cp ticket-prep/tickets_summary.json train-model/tickets_summary.json)
+- Run `python training.py` to start the training.

@@ -150,7 +150,7 @@ resource "azurerm_linux_virtual_machine" "vm1" {
   location               = azurerm_resource_group.rg.location
   resource_group_name    = azurerm_resource_group.rg.name
   network_interface_ids  = [azurerm_network_interface.nic1.id] 
-  size                   = "Standard_B4ms"          
+  size                   = "Standard_NV12ads_A10_v5"          
 
   custom_data = data.template_cloudinit_config.vm.rendered 
 
@@ -161,6 +161,7 @@ resource "azurerm_linux_virtual_machine" "vm1" {
     name                 = "osdisk1"
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
+    disk_size_gb         = 50
   }
 
   source_image_reference {
@@ -178,6 +179,15 @@ resource "azurerm_linux_virtual_machine" "vm1" {
   boot_diagnostics {
     storage_account_uri = azurerm_storage_account.storage_account.primary_blob_endpoint  # Use the storage account for the first VM
   }
+}
+
+resource "azurerm_virtual_machine_extension" "nvidia-driver" {
+  name                 = "NvidiaGpuDriverLinux"
+  virtual_machine_id   = azurerm_linux_virtual_machine.vm1.id
+  publisher            = "Microsoft.HpcCompute"
+  type                 = "NvidiaGpuDriverLinux"
+  type_handler_version = "1.9"
+  auto_upgrade_minor_version = true
 }
 
 # Generate random value for the MySQL server password
