@@ -1,0 +1,11 @@
+{
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": ".."
+	},
+	"runArgs": [
+		"--gpus=all",
+		"--name",
+		"devcontainer_train-model"
+	]
+}
