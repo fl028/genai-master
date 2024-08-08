@@ -10,7 +10,7 @@
         "--name",
         "devcontainer_ollama"
     ],
-    "postStartCommand": "ollama serve & sleep 5 && ollama run llama3",
+    "postStartCommand": "ollama serve & sleep 5 && ollama run llama3.1",
     "customizations": {
         "vscode": {
             "settings": {
