@@ -50,7 +50,7 @@ EOS_TOKEN = tokenizer.eos_token
 
 def formatting_prompts_func(examples):
     instructions = examples["question"]
-    inputs = ""
+    inputs = inputs = examples.get("input", [""] * len(instructions))
     outputs = examples["answer"]
     texts = []
     for instruction, input, output in zip(instructions, inputs, outputs):

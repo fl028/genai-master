@@ -150,7 +150,7 @@ resource "azurerm_linux_virtual_machine" "vm1" {
   location               = azurerm_resource_group.rg.location
   resource_group_name    = azurerm_resource_group.rg.name
   network_interface_ids  = [azurerm_network_interface.nic1.id] 
-  size                   = "Standard_NV12ads_A10_v5"          
+  size                   = "Standard_NV36ads_A10_v5"          
 
   custom_data = data.template_cloudinit_config.vm.rendered 
 
@@ -161,7 +161,7 @@ resource "azurerm_linux_virtual_machine" "vm1" {
     name                 = "osdisk1"
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
-    disk_size_gb         = 50
+    disk_size_gb         = 128
   }
 
   source_image_reference {
