@@ -129,17 +129,16 @@ inputs = tokenizer(
 ).to(device)
 
 model.eval()
-
 outputs = model.generate(**inputs, max_new_tokens=64, use_cache=True)
-
 print("Raw output tensor:", outputs)
-
 decoded_output = tokenizer.batch_decode(outputs, skip_special_tokens=True)
-
 print("Decoded output:", decoded_output)
 
 print("### SAVE ###")
+print("model.save_pretrained(\"lora_model\")")
 model.save_pretrained("lora_model")
+print("tokenizer.save_pretrained(\"lora_model\")")
 tokenizer.save_pretrained("lora_model")
+print("model.save_pretrained_gguf(\"lora_model_gguf\", tokenizer, quantization_method=\"f16\")")
+model.save_pretrained_gguf("lora_model_gguf", tokenizer, quantization_method="f16")
 
-model.save_pretrained_gguf("model", tokenizer, quantization_method="f16")
