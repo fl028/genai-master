@@ -1,0 +1,19 @@
+{
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "runArgs": [
+        "--gpus=all",
+        "--name",
+        "devcontainer_presidio"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python"
+            ]
+        }
+    },
+    "postCreateCommand": "python3 -m venv _venv && . _venv/bin/activate && pip install -r requirements.txt"
+}
