@@ -144,16 +144,7 @@ The raw data in the database can now be processed further. To do this, we need t
 
 2. **Run python scripts**:
 - Place the json file next to the python script (cp ticket-prep/tickets_summary.json train-model/tickets_summary.json)
-- Run `python3 training.py` to start the training.
-
-The following folders will be created:
-- **_unsloth_sentencepiece_temp/**: Temporary storage for SentencePiece tokenizer files during text data processing.
-- **lora_model/**: Stores the LoRA fine-tuning weights, representing lightweight adaptations to the base model.
-- **model/**: Holds the base pre-trained model used as the starting point for fine-tuning.
-- **model_finetuned_gguf/**: Contains the fine-tuned model optimized for efficient inference in GGUF format.
-- **outputs/**: Directory for storing the final outputs, predictions, and evaluation results from the trained model.
+- Run `python training.py` to start the training.
 
 3. **Save Model**
-- Convert to .gguf format (manually): `alias python=python3 && mkdir model_finetuned_gguf && cd llama.cpp && make clean && make all -j && python convert_hf_to_gguf.py /workspaces/genai-master/code/train-model/model --outtype f16 --outfile /workspaces/genai-master/code/train-model/model_finetuned_gguf/llama3.1_fine_tuned.gguf`
-- Copy raw model to local devcontainer: `scp -r -i /workspaces/genai-master/infrastructure/private_key.pem azureadmin@<IP>:/home/azureadmin/genai-master/code/train-model/model/ /workspaces/genai-master/code/train-model/model/`
-- Copy .gguf model to local devcontainer: `scp -i /workspaces/genai-master/infrastructure/private_key.pem azureadmin@<IP>:/home/azureadmin/genai-master/code/train-model/model_finetuned_gguf/llama3.1_fine_tuned.gguf /workspaces/genai-master/code/train-model/model/model_finetuned_gguf/llama3.1_fine_tuned.gguf`
+Copy .gguf model to local devcontainer: `scp -i /workspaces/genai-master/infrastructure/private_key.pem azureadmin@<IP>:/home/azureadmin/genai-master/code/train-model/lora_model_gguf/unsloth.F16.gguf /workspaces/genai-master/code/train-model/lora_model_gguf/unsloth.F16.gguf`
