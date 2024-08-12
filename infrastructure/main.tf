@@ -222,6 +222,8 @@ resource "azurerm_mysql_flexible_server" "mysql" {
   storage {
     size_gb = 20
   }
+
+  depends_on = [azurerm_private_dns_zone_virtual_network_link.default]
 }
 
 output "mysql_password" {
