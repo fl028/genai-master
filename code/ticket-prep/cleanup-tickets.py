@@ -62,22 +62,25 @@ def starts_with_keyword(line, keywords):
 def is_empty_line(line):
     return not line.strip()
 
-def contains_word_condition(word, conditions):
-    return any(condition(word) for condition in conditions)
-
-def clean_word(word, word_conditions):
-    if contains_word_condition(word, word_conditions):
-        return None
-    return word
-
-def clean_text(text, line_conditions, word_conditions):
+def clean_text(text, line_conditions, word_conditions, keywords):
     cleaned_lines = []
     for line in text.split('\n'):
         if not any(condition(line) for condition in line_conditions):
             words = line.split()
-            cleaned_words = [clean_word(word, word_conditions) for word in words if clean_word(word, word_conditions) is not None]
-            cleaned_lines.append(' '.join(cleaned_words))
-    return '\n'.join(cleaned_lines)
+            cleaned_words = [word for word in words if not any(condition(word) for condition in word_conditions)]
+            cleaned_line = ' '.join(cleaned_words)
+            cleaned_lines.append(cleaned_line)
+
+    cleaned_text = '\n'.join(cleaned_lines)
+    
+    # Replace keywords in the entire cleaned text
+    for keyword in keywords:
+        cleaned_text = re.sub(r'\b{}\b'.format(re.escape(keyword)), '', cleaned_text)
+
+    # Clean up any extra spaces and empty lines after keyword replacement
+    cleaned_text = '\n'.join(line.strip() for line in cleaned_text.splitlines() if line.strip())
+    
+    return cleaned_text
 
 class DB:
     def __init__(self, config):
@@ -191,7 +194,7 @@ if __name__ == "__main__":
     with open('config.json', 'r') as file:
         config = json.load(file)
 
-    keywords = config.get('starts_with_keywords', [])
+    keywords = config.get('keywords', [])
 
     line_conditions = [
         starts_with_datetime,
@@ -219,7 +222,7 @@ if __name__ == "__main__":
             ticket_df = db.read_ticket(ticket_id)
             if not ticket_df.empty:
                 raw_text = ticket_df.loc[0, 'text']
-                cleaned_text = clean_text(raw_text, line_conditions, word_conditions)
+                cleaned_text = clean_text(raw_text, line_conditions, word_conditions, keywords)
                 db.insert_cleaned_text(ticket_id, cleaned_text)
         else:
             print(f"Ticket ID {ticket_id} already exists in tickets_texts.")

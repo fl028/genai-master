@@ -3,7 +3,7 @@
     "db-password": "...",
     "db-host": "genai-master-db.mysql.database.azure.com",
     "db-database": "data",
-    "starts_with_keywords": [
+    "keywords": [
         "____________________",
         "------",
         "*****",

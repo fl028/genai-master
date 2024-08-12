@@ -54,6 +54,7 @@ Use Terraform to set up the required Azure infrastructure.
    - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' -e "SHOW DATABASES;"` to test db connection
    - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' -D data -e "CREATE TABLE tickets (id INT(11) PRIMARY KEY, sap_ticketstatus VARCHAR(50), sap_ticketstatus_t VARCHAR(50), sap_ticketno VARCHAR(50), cdl_text VARCHAR(250), guid VARCHAR(50), processtype VARCHAR(50), action VARCHAR(50), company INT(11), reporter INT(11), supportteam INT(11), editor INT(11), status VARCHAR(50), statustxt VARCHAR(50), category VARCHAR(50), component VARCHAR(50), ibase INT(11), sysrole VARCHAR(10), priority INT(11), title VARCHAR(255), text TEXT, text2 VARCHAR(50), security VARCHAR(50), postpuntil VARCHAR(50), linkid VARCHAR(50), cdlid VARCHAR(50), optid VARCHAR(50), psp VARCHAR(50), units VARCHAR(50), type VARCHAR(50));"` to create the table.
    - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' -D data -e "CREATE TABLE tickets_texts (id INT(11) PRIMARY KEY, text TEXT);"` to create the table.
+   - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'' -D data -e "CREATE TABLE tickets_texts_cleaned (id INT(11) PRIMARY KEY, text TEXT);"` to create the table.
    - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' -D data -e "CREATE TABLE tickets_summary (id INT(11) PRIMARY KEY, question TEXT, answer TEXT);"` to create the table.
 
 3. **Clone repo**
@@ -106,17 +107,26 @@ The raw data in the database can now be processed further. To do this, we need t
     "db-user": "mysqladmin",
     "db-password": "...",
     "db-host": "genai-master-db.mysql.database.azure.com",
-    "db-database": "data"
+    "db-database": "data",
+    "keywords": [
+        "____________________",
+        "------",
+        "*****",
+        "#####",
+        ">>>",
+        "<<<",
+        ....
+    ]
 }`
 
 3. **Run python scripts**:
 - Run `python check-tickets-cleaned.py` to check the db (table: tickets_texts) contents.
 - Run `python cleanup-tickets.py` to cleanup the tickets db (table: tickets_texts) contents.
 
-### Ollama hosting
+### Ollama and Presidio hosting
 
 1. **Setup VM with GPU**:
-- in the main.tf set  size  = "Standard_NV36ads_A10_v5" 
+- in the main.tf set  size  = "Standard_NV6ads_A10_v5/ Standard_NV36ads_A10_v5" 
 - redeploy terraform infrastructure
 - check gpu: `sudo lspci | grep -i nvidia` or `sudo lshw -C display`
 - install NVIDIA drivers and CUDA toolkit - this should be installed via tf (https://learn.microsoft.com/en-us/azure/virtual-machines/linux/n-series-driver-setup)
@@ -125,12 +135,20 @@ The raw data in the database can now be processed further. To do this, we need t
 - check gpu in container: `sudo systemctl restart docker && docker run --gpus all nvcr.io/nvidia/k8s/cuda-sample:nbody nbody -gpu -benchmark`
 
 2. **Reopen in Container**:
+- Open the folder: `~/genai-master/code/ticket-presidio`
+- Open the Command Palette: select: `Dev Containers: Reopen in Container`
+- VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
+
+3. **Run python scripts**:
+- Run `python clean-pii.py` to remove pii contents.
+
+4. **Reopen in Container**:
 - Open the folder: `~/genai-master/code/ticket-ollama`
 - Open the Command Palette: select: `Dev Containers: Reopen in Container`
 - VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
 - In this container a local llm is hosted to summarize the incident data
 
-3. **Run python scripts**:
+5. **Run python scripts**:
 - Run `python check-tickets-summed.py` to check the db (table: tickets_texts) contents.
 - Run `python sum-tickets.py` to sum the tickets db (table: tickets_summary) contents.
 
