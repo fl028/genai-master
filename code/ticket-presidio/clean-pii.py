@@ -38,6 +38,7 @@ def analyze_with_transformer(text):
     return presidio_results
 
 def anonymize_pii(text):
+    print("anonymize_pii")
     transformer_results = analyze_with_transformer(text)
     analyzer_results = analyzer.analyze(
         text=text, 
@@ -55,7 +56,9 @@ def anonymize_pii(text):
         for result in all_results
         if result.entity_type in ANONYMIZE_ENTITY_TYPES
     ]
-    anonymized_text = anonymizer.anonymize(text=text, analyzer_results=anonymizer_results)
+    anonymized_result = anonymizer.anonymize(text=text, analyzer_results=anonymizer_results)
+    anonymized_text = anonymized_result.text
+    
     return anonymized_text
 
 class DB:
@@ -77,11 +80,11 @@ class DB:
             cursor.close()
             self.connection.close()
 
-    def check_ticket_exists_in_tickets_texts(self, ticket_id):
+    def check_ticket_exists_in_tickets_texts_cleaned(self, ticket_id):
         try:
             if self.connection.is_connected():
                 cursor = self.connection.cursor()
-                query = "SELECT COUNT(*) FROM tickets_texts WHERE id = %s;"
+                query = "SELECT COUNT(*) FROM tickets_texts_cleaned WHERE id = %s;"
                 cursor.execute(query, (ticket_id,))
                 counter = cursor.fetchone()[0]
                 return counter == 1
@@ -95,7 +98,7 @@ class DB:
         try:
             if self.connection.is_connected():
                 cursor = self.connection.cursor()
-                query = "SELECT COUNT(*) FROM tickets;"
+                query = "SELECT COUNT(*) FROM tickets_texts;"
                 cursor.execute(query)
                 counter = cursor.fetchone()[0]
                 return int(counter)
@@ -108,7 +111,7 @@ class DB:
     def read_ticket(self, ticket_id):
         if self.connection is None:
             return None
-        query = "SELECT id, text FROM tickets WHERE id = %s;"
+        query = "SELECT id, text FROM tickets_texts WHERE id = %s;"
         try:
             cursor = self.connection.cursor()
             cursor.execute(query, (ticket_id,))
@@ -121,13 +124,15 @@ class DB:
             print(f"Error: {e}")
             return None
 
-    def update_cleaned_text(self, ticket_id, cleaned_text):
+    def insert_cleaned_text(self, ticket_id, cleaned_text):
         try:
             if self.connection.is_connected():
                 cursor = self.connection.cursor()
-                query = "UPDATE tickets_texts SET text = %s WHERE id = %s;"
-                cursor.execute(query, (cleaned_text, ticket_id))
+
+                query = "INSERT INTO tickets_texts_cleaned (id, text) VALUES (%s, %s);"
+                cursor.execute(query, (ticket_id, cleaned_text))
                 self.connection.commit()
+                print(f"Inserted cleaned text for ticket ID {ticket_id}.")
         except Error as e:
             print(f"Error: {e}")
         finally:
@@ -142,18 +147,22 @@ if __name__ == "__main__":
 
     db = DB(config)
 
-    ticket_id = 11851846
+    ticket_id = 11851846 # 01.06.2024
 
     ticket_counter = db.get_tickets_counter()
     print(f"Rows: {ticket_counter}")
 
     for counter in range(ticket_counter):
-        ticket_df = db.read_ticket(ticket_id)
-        if ticket_df is not None and not ticket_df.empty:
-            raw_text = ticket_df.loc[0, 'text']
-            cleaned_text = anonymize_pii(raw_text)
-            db.update_cleaned_text(ticket_id, cleaned_text)
+        if not db.check_ticket_exists_in_tickets_texts_cleaned(ticket_id):
+            ticket_df = db.read_ticket(ticket_id)
+            if ticket_df is not None and not ticket_df.empty:
+                raw_text = ticket_df.loc[0, 'text']
+                cleaned_text = anonymize_pii(raw_text)
+                print(cleaned_text)
+                db.insert_cleaned_text(ticket_id, cleaned_text)
+            else:
+                print(f"No data found for ticket ID {ticket_id}.")
         else:
-            print(f"No data found for ticket ID {ticket_id}.")
+            print(f"Ticket ID {ticket_id} already exists in tickets_texts_cleaned.")
 
         ticket_id = ticket_id - 1

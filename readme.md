@@ -54,7 +54,7 @@ Use Terraform to set up the required Azure infrastructure.
    - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' -e "SHOW DATABASES;"` to test db connection
    - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' -D data -e "CREATE TABLE tickets (id INT(11) PRIMARY KEY, sap_ticketstatus VARCHAR(50), sap_ticketstatus_t VARCHAR(50), sap_ticketno VARCHAR(50), cdl_text VARCHAR(250), guid VARCHAR(50), processtype VARCHAR(50), action VARCHAR(50), company INT(11), reporter INT(11), supportteam INT(11), editor INT(11), status VARCHAR(50), statustxt VARCHAR(50), category VARCHAR(50), component VARCHAR(50), ibase INT(11), sysrole VARCHAR(10), priority INT(11), title VARCHAR(255), text TEXT, text2 VARCHAR(50), security VARCHAR(50), postpuntil VARCHAR(50), linkid VARCHAR(50), cdlid VARCHAR(50), optid VARCHAR(50), psp VARCHAR(50), units VARCHAR(50), type VARCHAR(50));"` to create the table.
    - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' -D data -e "CREATE TABLE tickets_texts (id INT(11) PRIMARY KEY, text TEXT);"` to create the table.
-   - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'' -D data -e "CREATE TABLE tickets_texts_cleaned (id INT(11) PRIMARY KEY, text TEXT);"` to create the table.
+   - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' -D data -e "CREATE TABLE tickets_texts_cleaned (id INT(11) PRIMARY KEY, text TEXT);"` to create the table.
    - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' -D data -e "CREATE TABLE tickets_summary (id INT(11) PRIMARY KEY, question TEXT, answer TEXT);"` to create the table.
 
 3. **Clone repo**

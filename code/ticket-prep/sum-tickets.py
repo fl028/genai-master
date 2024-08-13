@@ -39,7 +39,7 @@ class DB:
             if self.connection.is_connected():
                 cursor = self.connection.cursor()
 
-                query = "SELECT COUNT(*) FROM tickets_texts WHERE id = %s;"
+                query = "SELECT COUNT(*) FROM tickets_texts_cleaned WHERE id = %s;"
 
                 cursor.execute(query, (ticket_id,))
                 counter = cursor.fetchone()[0]
@@ -77,7 +77,7 @@ class DB:
             if self.connection.is_connected():
                 cursor = self.connection.cursor()
 
-                query = "SELECT COUNT(*) FROM tickets;"
+                query = "SELECT COUNT(*) FROM tickets_texts_cleaned;"
 
                 cursor.execute(query)
                 counter = cursor.fetchone()[0]
@@ -95,7 +95,7 @@ class DB:
             print("No connection to the database.")
             return None
         
-        query = "SELECT id, text FROM tickets_texts WHERE id = %s;"
+        query = "SELECT id, text FROM tickets_texts_cleaned WHERE id = %s;"
         
         try:
             cursor = self.connection.cursor()
