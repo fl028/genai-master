@@ -27,7 +27,7 @@ CREATE TABLE `tickets` (
   `sysrole` VARCHAR(10) DEFAULT NULL,
   `priority` INT DEFAULT NULL,
   `title` VARCHAR(255) DEFAULT NULL,
-  `text` TEXT DEFAULT NULL,
+  `text` MEDIUMTEXT DEFAULT NULL,
   `text2` VARCHAR(50) DEFAULT NULL,
   `security` VARCHAR(50) DEFAULT NULL,
   `postpuntil` VARCHAR(50) DEFAULT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE `tickets` (
 DROP TABLE IF EXISTS `tickets_texts`;
 CREATE TABLE `tickets_texts` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `text` TEXT DEFAULT NULL,
+  `text` MEDIUMTEXT DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
@@ -61,6 +61,6 @@ CREATE TABLE `tickets_summary` (
 DROP TABLE IF EXISTS `tickets_texts_cleaned`;
 CREATE TABLE `tickets_texts_cleaned` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `text` TEXT DEFAULT NULL,
+  `text` MEDIUMTEXT DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
