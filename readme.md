@@ -56,7 +56,14 @@ Use Terraform to set up the required Azure infrastructure.
    - Run `terraform output -raw mysql_password` in the terraform dev container to retrieve the db-password.
    - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' -e "SHOW DATABASES;"` to test db connection
    - Run `mysql -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' -D data < ~/genai-master/infrastructure/create_data_db.sql` to create all tables
-   
+
+4. **Setup GPU**:
+- check gpu: `sudo lspci | grep -i nvidia` or `sudo lshw -C display`
+- install NVIDIA drivers and CUDA toolkit - this should be installed via tf (https://learn.microsoft.com/en-us/azure/virtual-machines/linux/n-series-driver-setup)
+- check gpu drivers: `cat /proc/driver/nvidia/version` or `nvidia-smi`
+- install NVIDIA Container Toolkit - we have to install it manually (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt)
+- check gpu in container: `sudo systemctl restart docker && docker run --gpus all nvcr.io/nvidia/k8s/cuda-sample:nbody nbody -gpu -benchmark`
+
    
 ## Finetune a LLM with custom data 
 
@@ -123,30 +130,21 @@ The raw data in the database can now be processed further. To do this, we need t
 
 ### Ollama and Presidio hosting
 
-1. **Setup VM with GPU**:
-- in the main.tf set  size  = "Standard_NV6ads_A10_v5/ Standard_NV36ads_A10_v5" 
-- redeploy terraform infrastructure
-- check gpu: `sudo lspci | grep -i nvidia` or `sudo lshw -C display`
-- install NVIDIA drivers and CUDA toolkit - this should be installed via tf (https://learn.microsoft.com/en-us/azure/virtual-machines/linux/n-series-driver-setup)
-- check gpu drivers: `cat /proc/driver/nvidia/version` or `nvidia-smi`
-- install NVIDIA Container Toolkit - we have to install it manually (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt)
-- check gpu in container: `sudo systemctl restart docker && docker run --gpus all nvcr.io/nvidia/k8s/cuda-sample:nbody nbody -gpu -benchmark`
-
-2. **Reopen in Container**:
+1. **Reopen in Container**:
 - Open the folder: `~/genai-master/code/ticket-presidio`
 - Open the Command Palette: select: `Dev Containers: Reopen in Container`
 - VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
 
-3. **Run python scripts**:
+2. **Run python scripts**:
 - Run `python clean-pii.py` to remove pii contents.
 
-4. **Reopen in Container**:
+3. **Reopen in Container**:
 - Open the folder: `~/genai-master/code/ticket-ollama`
 - Open the Command Palette: select: `Dev Containers: Reopen in Container`
 - VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
 - In this container a local llm is hosted to summarize the incident data
 
-5. **Run python scripts**:
+4. **Run python scripts**:
 - Run `python check-tickets-summed.py` to check the db (table: tickets_texts) contents.
 - Run `python sum-tickets.py` to sum the tickets db (table: tickets_summary) contents.
 
