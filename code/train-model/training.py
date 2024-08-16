@@ -26,7 +26,7 @@ model = FastLanguageModel.get_peft_model(
     r=16,
     target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
     lora_alpha=16,
-    lora_dropout=0,
+    lora_dropout=0.1,
     bias="none",
     use_gradient_checkpointing="unsloth",
     random_state=3407,
@@ -36,11 +36,7 @@ model = FastLanguageModel.get_peft_model(
 
 alpaca_prompt = """You are given an IT Incident Problem along with additional context. Your task is to provide a detailed response that addresses the incident. Include steps for troubleshooting and resolution, and provide clear, actionable guidance to the user. Ensure your response is well-organized and addresses all aspects of the incident.
 
-
-### Instruction:
-{}
-
-### Input:
+### Question:
 {}
 
 ### Response:
@@ -50,11 +46,10 @@ EOS_TOKEN = tokenizer.eos_token
 
 def formatting_prompts_func(examples):
     instructions = examples["question"]
-    inputs = inputs = examples.get("input", [""] * len(instructions))
     outputs = examples["answer"]
     texts = []
-    for instruction, input, output in zip(instructions, inputs, outputs):
-        text = alpaca_prompt.format(instruction, input, output) + EOS_TOKEN
+    for instruction, output in zip(instructions, outputs):
+        text = alpaca_prompt.format(instruction, output) + EOS_TOKEN
         texts.append(text)
     return { "text": texts }
 
@@ -73,20 +68,22 @@ trainer = SFTTrainer(
     dataset_num_proc=2,
     packing=False,
     args=TrainingArguments(
-        per_device_train_batch_size=2,
-        gradient_accumulation_steps=4,
-        warmup_steps=5,
-        num_train_epochs=3,
-        max_steps=80,
-        learning_rate=1e-4,
+        per_device_train_batch_size=4,
+        gradient_accumulation_steps=2,
+        warmup_steps=50,
+        num_train_epochs=5,
+        max_steps=-1,
+        learning_rate=5e-5,
         fp16=not is_bfloat16_supported(),
         bf16=is_bfloat16_supported(),
-        logging_steps=1,
-        optim="adamw_8bit",
+        logging_steps=10,
+        optim="adamw_torch",
         weight_decay=0.01,
         lr_scheduler_type="linear",
         seed=3407,
         output_dir="outputs",
+        save_steps=200,
+        save_total_limit=2,
     ),
 )
 

@@ -1,0 +1,22 @@
+{
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": ".."
+	},
+	"runArgs": [
+		"--gpus=all",
+		"--name",
+		"devcontainer_deploy_ollama"
+	],
+	"postStartCommand": "ollama serve",
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"remote.autoForwardPorts": false
+			},
+			"extensions": [
+				"rangav.vscode-thunder-client"
+			]
+		}
+	}
+}

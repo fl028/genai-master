@@ -230,7 +230,7 @@ if __name__ == "__main__":
                 db.insert_ticket(parsed_data['properties'])
             except Exception as e:
                 print(f"Error: {e}")
-            time.sleep(1)
+            time.sleep(0.5)
         else:
             print("Skipping ...")
 

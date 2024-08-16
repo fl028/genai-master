@@ -162,3 +162,18 @@ The raw data in the database can now be processed further. To do this, we need t
 
 3. **Save Model**
 Copy .gguf model to local devcontainer: `scp -i /workspaces/genai-master/infrastructure/private_key.pem azureadmin@<IP>:/home/azureadmin/genai-master/code/train-model/lora_model_gguf/unsloth.F16.gguf /workspaces/genai-master/code/train-model/lora_model_gguf/unsloth.F16.gguf`
+
+## Deploy LLM 
+
+1. **Reopen in Container**:
+- The architecture of the vs code dev container is also used in the phases. So we open the first folder in the container. Only now we are locally again.
+- Open the folder: `~/genai-master/code/deploy-ollama`
+- Open the Command Palette: select: `Dev Containers: Reopen in Container`
+- VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
+
+2. **Run model**:
+- Place the .gguf model in code\deploy-ollama\models\time_stamp
+- Edit the .modelfile
+- Run `ollama create llama3.1-finetuned-time_stamp --file models/time_stamp/llama3.1-finetuned-time_stamp.modelfile`
+- Run `ollama run llama3.1-finetuned-time_stamp`
+- Run prompts via cli or rest api

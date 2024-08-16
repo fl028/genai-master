@@ -1,0 +1,45 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "thunder-collection_llama3.1",
+    "collectionId": "80fc437e-c1a7-4729-b71b-6b1ef283b42e",
+    "dateExported": "2024-08-16T21:58:28.393Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "7df17e3d-c944-4658-8fe6-4b819b439db3",
+            "colId": "80fc437e-c1a7-4729-b71b-6b1ef283b42e",
+            "containerId": "",
+            "name": "Generate",
+            "url": "http://localhost:11434/api/generate",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2024-08-16T21:55:19.265Z",
+            "modified": "2024-08-16T21:55:53.027Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"model\": \"llama3.1-finetuned-2024-08-16\",\n  \"prompt\": \"Hi! Whatsupp?\",\n  \"stream\": false\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "76e5455d-8322-46c5-b7ac-2e4fb059ce02",
+            "colId": "80fc437e-c1a7-4729-b71b-6b1ef283b42e",
+            "containerId": "",
+            "name": "Generate - Solve Incident",
+            "url": "http://localhost:11434/api/generate",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2024-08-16T21:56:10.083Z",
+            "modified": "2024-08-16T21:57:53.475Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"model\": \"llama3.1-finetuned-2024-08-16\",\n  \"prompt\": \"A database (MaxDB) indicating high sessions usage (hosted on DB001).\",\n  \"stream\": false\n}",
+                "form": []
+            }
+        }
+    ],
+    "ref": "brt2iLITp1oiJWZoUoPZdzuH-chp8xQzpxWtB-jH8XJ6b3xDPvOmqPs-qmTM3kz_Tmjx1AVy2SKDZJVKTBV9Og"
+}
