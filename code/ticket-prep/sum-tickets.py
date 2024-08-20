@@ -161,7 +161,7 @@ if __name__ == "__main__":
 
                     body_question = {
                         "model": "llama3.1",
-                        "prompt": "The following text is an IT incident ticket. Please summarize the ticket text by focusing solely on describing the problem, including the type of issue, affected systems or components, potential causes, and the impact on users or operations. Ensure that any important commands, programs, or scripts mentioned in the ticket are included in the summary. Do not include any solution hints or steps taken to resolve the issue. The summary should be concise, in no more than four sentences, and should maintain a technical and abstract tone suitable for general application to similar IT incidents. Start directly with the summary and do not include any introductory or closing phrases. \n\n" + cleaned_text,
+                        "prompt": "The following text is an IT incident ticket. Please summarize the ticket by focusing on the issue, including the type, affected systems or components, potential causes, and the impact on users or operations. The summary should be concise (no more than five sentences), maintaining a technical tone suitable for a general audience of IT professionals. Use present tense and english language. Begin directly with the summary, avoiding any introductory or closing remarks. \n\n" + cleaned_text,
                         "stream": False
                     }
 
@@ -178,7 +178,7 @@ if __name__ == "__main__":
 
                     body_answer = {
                         "model": "llama3.1",
-                        "prompt": "The following text is an IT incident ticket. Please summarize the steps taken to resolve the issue, including any commands, programs, scripts, or configurations used, in a manner that can be applied to similar IT incidents. Focus solely on the solution and the actions performed, without mentioning the original problem. The summary should be concise, in no more than four sentences, and should maintain a technical and abstract tone suitable for general application. Start directly with the summary and do not include any introductory or closing phrases. \n\n" + cleaned_text,
+                        "prompt": "The following text is an IT incident ticket. Summarize the steps required to resolve the issue, including any commands, programs, scripts, or configurations that can be helpfull. Present the solution as actionable steps that can be applied to solve the incident, focusing solely on the resolution process without referencing the original problem. The summary should be concise (no more than five sentences) and maintain a technical tone suitable for general application. Use present tense and english language. Begin directly with the summary, avoiding any introductory or closing remarks. \n\n" + cleaned_text,
                         "stream": False
                     }
 
