@@ -16,3 +16,6 @@ commands.md
 
 # py 
 _venv/
+
+# fined tuned models
+*.gguf
