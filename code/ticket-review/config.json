@@ -1,0 +1,14 @@
+{
+    "db-user": "mysqladmin",
+    "db-password": "...",
+    "db-host": "genai-master-db.mysql.database.azure.com",
+    "db-database": "data",
+    "keywords": [
+        "____________________",
+        "------",
+        "*****",
+        "#####",
+        ">>>",
+        "<<<"
+    ]
+}

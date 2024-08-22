@@ -148,6 +148,20 @@ The raw data in the database can now be processed further. To do this, we need t
 - Run `python check-tickets-summed.py` to check the db (table: tickets_texts) contents.
 - Run `python sum-tickets.py` to sum the tickets db (table: tickets_summary) contents.
 
+### Ticket Review (optional step and helper script)
+
+1. **Reopen in Container**:
+- Open the folder: `~/genai-master/code/ticket-review`
+- Open the Command Palette: select: `Dev Containers: Reopen in Container`
+- VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
+
+2. **Run python scripts**:
+- Run `python review-tickets.py` to scan the database an improve the quality manually.
+
+3. **Save data**
+- Run `mysqldump -h genai-master-db.mysql.database.azure.com -u mysqladmin -p'...' --databases data > dump.sql` to dump data.
+- Run `scp -i /workspaces/genai-master/infrastructure/private_key.pem azureadmin@IP:/home/azureadmin/dump.sql /workspaces/genai-master/dump.sql` to copy data to local.
+
 ### Traning
 
 1. **Reopen in Container**:
