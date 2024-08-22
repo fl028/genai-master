@@ -10,5 +10,22 @@
         "#####",
         ">>>",
         "<<<"
-    ]
+    ],
+    "specific_terms": {
+        "CMD": "Eingabeaufforderung (CMD) in Windows",
+        "SSH": "Secure Shell (SSH)",
+        "SSL": "Secure Sockets Layer (SSL)",
+        "TLS": "Transport Layer Security (TLS)",
+        "VPN": "Virtuelles privates Netzwerk (VPN)",
+        "HTTP": "Hypertext Transfer Protocol (HTTP)",
+        "HTTPS": "Hypertext Transfer Protocol Secure (HTTPS)",
+        "IP": "Internet Protocol (IP)",
+        "DNS": "Domain Name System (DNS)",
+        "FTP": "File Transfer Protocol (FTP)",
+        "SMTP": "Simple Mail Transfer Protocol (SMTP)",
+        "Bash": "Bourne Again Shell (Bash)",
+        "Shell": "Unix Shell",
+        "Kernel": "Linux Kernel",
+        "Cron": "Cron Job Scheduler"
+    }
 }

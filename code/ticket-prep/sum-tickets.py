@@ -4,6 +4,7 @@ import mysql.connector
 from mysql.connector import Error, IntegrityError
 import logging
 import pandas as pd
+import random
 
 class DB:
     def __init__(self, config):
@@ -32,7 +33,7 @@ class DB:
             self.connection.close()
             print("Connection to the database was successfully closed.")
         else:
-            print("Failed to close to the database connection.")
+            print("Failed to close the database connection.")
 
     def check_ticket_exists_in_tickets_texts(self, ticket_id):
         try:
@@ -144,6 +145,32 @@ if __name__ == "__main__":
     ticket_counter = db.get_tickets_counter()
     print(f"Cleaned ticket texts: {ticket_counter}")
 
+    question_prompts = [
+        "The following text is an IT incident ticket. Please summarize the ticket by focusing on the issue, including the type, affected systems or components, potential causes, and the impact on users or operations. The summary should be concise (no more than five sentences), maintaining a technical tone suitable for a general audience of IT professionals. Use present tense and english language. Begin directly with the summary, avoiding any introductory or closing remarks.",
+        "The following text is an IT incident ticket. Please summarize the ticket by focusing on the issue. The summary should be concise (no more than four sentences), maintaining a technical tone suitable for a general audience of IT professionals. Use present tense and english language."
+    ]
+
+    answer_prompts = [
+        "The following text is an IT incident ticket. Summarize the steps required to resolve the issue, including any commands, programs, scripts, or configurations that can be helpful. Present the solution as actionable steps that can be applied to solve the incident, focusing solely on the resolution process without referencing the original problem. The summary should be concise (no more than five sentences) and maintain a technical tone suitable for general application. Use present tense and english language. Begin directly with the summary, avoiding any introductory or closing remarks.",
+        "The following text is an IT incident ticket. Summarize the steps required to resolve the issue, including any step and hint that can be helpful. Present the solution as actionable steps without referencing the original problem. The summary should be concise (no more than four sentences). Use present tense and english language."
+    ]
+
+    timeout_seconds = 5  # Timeout for API call
+
+    def make_api_call(url, headers, body):
+        """Helper function to perform API call with retry logic for timeout."""
+        while True:
+            try:
+                response = requests.post(url, headers=headers, data=json.dumps(body), timeout=timeout_seconds)
+                if response.status_code == 200:
+                    return response.json()['response']
+                else:
+                    print("Failed to call API. Status code:", response.status_code)
+                    print("Response:", response.text)
+                    return None
+            except requests.exceptions.Timeout:
+                print("API call timed out. Retrying...")
+
     for counter in range(ticket_counter):
         if not db.check_ticket_exists_in_tickets_summary(ticket_id):
             print(f"Process: {ticket_id}")
@@ -152,6 +179,9 @@ if __name__ == "__main__":
                 if not ticket_df.empty:
                     cleaned_text = ticket_df.loc[0, 'text']
                    
+                    # Select random prompts
+                    question_prompt = random.choice(question_prompts)
+                    answer_prompt = random.choice(answer_prompts)
 
                     url = "http://devcontainer_ollama:11434/api/generate"
 
@@ -159,44 +189,33 @@ if __name__ == "__main__":
                         "Content-Type": "application/json"
                     }
 
+                    # API call for question
                     body_question = {
                         "model": "llama3.1",
-                        "prompt": "The following text is an IT incident ticket. Please summarize the ticket by focusing on the issue, including the type, affected systems or components, potential causes, and the impact on users or operations. The summary should be concise (no more than five sentences), maintaining a technical tone suitable for a general audience of IT professionals. Use present tense and english language. Begin directly with the summary, avoiding any introductory or closing remarks. \n\n" + cleaned_text,
+                        "prompt": question_prompt + "\n\n" + cleaned_text,
                         "stream": False
                     }
 
-                    response = requests.post(url, headers=headers, data=json.dumps(body_question))
+                    question = make_api_call(url, headers, body_question)
+                    if not question:
+                        continue  # Skip to next ticket if API call fails
 
-                    if response.status_code == 200:
-                        data = response.json()
-                        question = data['response']
-                        print("question: " + question)
-                    else:
-                        print("Failed to call API. Status code:", response.status_code)
-                        print("Response:", response.text)
+                    print("question: " + question)
 
-
+                    # API call for answer
                     body_answer = {
                         "model": "llama3.1",
-                        "prompt": "The following text is an IT incident ticket. Summarize the steps required to resolve the issue, including any commands, programs, scripts, or configurations that can be helpfull. Present the solution as actionable steps that can be applied to solve the incident, focusing solely on the resolution process without referencing the original problem. The summary should be concise (no more than five sentences) and maintain a technical tone suitable for general application. Use present tense and english language. Begin directly with the summary, avoiding any introductory or closing remarks. \n\n" + cleaned_text,
+                        "prompt": answer_prompt + "\n\n" + cleaned_text,
                         "stream": False
                     }
 
-                    response = requests.post(url, headers=headers, data=json.dumps(body_answer))
+                    answer = make_api_call(url, headers, body_answer)
+                    if not answer:
+                        continue  # Skip to next ticket if API call fails
 
-                    if response.status_code == 200:
-                        data = response.json()
-                        answer = data['response']
-                        print("answer: " + answer)
-                    else:
-                        print("Failed to call API. Status code:", response.status_code)
-                        print("Response:", response.text)
+                    print("answer: " + answer)
 
-                    
-                    db.insert_summed_text(ticket_id,question,answer)
+                    db.insert_summed_text(ticket_id, question, answer)
         else:
             print(f"Ticket ID {ticket_id} already exists in tickets_summary.")
         ticket_id = ticket_id - 1
-
-
-

@@ -62,7 +62,12 @@ def starts_with_keyword(line, keywords):
 def is_empty_line(line):
     return not line.strip()
 
-def clean_text(text, line_conditions, word_conditions, keywords):
+def replace_specific_terms(text, specific_terms):
+    for term, replacement in specific_terms.items():
+        text = re.sub(r'\b{}\b'.format(re.escape(term)), replacement, text, flags=re.IGNORECASE)
+    return text
+
+def clean_text(text, line_conditions, word_conditions, keywords, term_dict):
     cleaned_lines = []
     for line in text.split('\n'):
         if not any(condition(line) for condition in line_conditions):
@@ -72,6 +77,9 @@ def clean_text(text, line_conditions, word_conditions, keywords):
             cleaned_lines.append(cleaned_line)
 
     cleaned_text = '\n'.join(cleaned_lines)
+    
+    # Replace specific terms
+    cleaned_text = replace_specific_terms(cleaned_text, term_dict)
     
     # Replace keywords in the entire cleaned text
     for keyword in keywords:
@@ -186,6 +194,25 @@ class DB:
         finally:
             if self.connection.is_connected():
                 cursor.close()
+    
+    def read_ticket_title(self, ticket_id):
+        if self.connection is None:
+            print("No connection to the database.")
+            return None
+        
+        query = "SELECT title FROM tickets WHERE id = %s;"
+        
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(query, (ticket_id,))
+            title = cursor.fetchone()
+            
+            cursor.close()
+            
+            return title[0] if title else None
+        except Error as e:
+            print(f"Error: {e}")
+            return None
 
 
 if __name__ == "__main__":
@@ -195,6 +222,7 @@ if __name__ == "__main__":
         config = json.load(file)
 
     keywords = config.get('keywords', [])
+    specific_terms = config.get('specific_terms', {})
 
     line_conditions = [
         starts_with_datetime,
@@ -221,8 +249,14 @@ if __name__ == "__main__":
         if not db.check_ticket_exists_in_tickets_texts(ticket_id):
             ticket_df = db.read_ticket(ticket_id)
             if not ticket_df.empty:
+                title = db.read_ticket_title(ticket_id)
                 raw_text = ticket_df.loc[0, 'text']
-                cleaned_text = clean_text(raw_text, line_conditions, word_conditions, keywords)
+                cleaned_text = clean_text(raw_text, line_conditions, word_conditions, keywords, specific_terms)
+                
+                if title:
+                    # Prepend the title to the cleaned text
+                    cleaned_text = f"Title: {title}\n\n{cleaned_text}"
+                    
                 db.insert_cleaned_text(ticket_id, cleaned_text)
         else:
             print(f"Ticket ID {ticket_id} already exists in tickets_texts.")
