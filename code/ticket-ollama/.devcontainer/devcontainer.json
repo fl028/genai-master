@@ -15,7 +15,10 @@
         "vscode": {
             "settings": {
                 "remote.autoForwardPorts": false
-            }
+            },
+            "extensions": [
+                "rangav.vscode-thunder-client"
+            ]
         }
     }
 }

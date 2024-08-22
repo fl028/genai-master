@@ -1,0 +1,45 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "thunder-collection_llama3.1",
+    "collectionId": "1c2493d9-bd73-4cff-a0d8-4226eea26d0b",
+    "dateExported": "2024-08-22T20:13:50.627Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "482db134-05f8-4db5-bcf4-d8b91dca3335",
+            "colId": "1c2493d9-bd73-4cff-a0d8-4226eea26d0b",
+            "containerId": "",
+            "name": "Generate - Question",
+            "url": "http://localhost:11434/api/generate",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2024-08-22T18:48:38.163Z",
+            "modified": "2024-08-22T19:20:20.538Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"model\": \"llama3.1\",\n  \"prompt\": \"The following text is an IT incident ticket. Please summarize the ticket by focusing on the issue, including the type, affected systems or components, potential causes, and the impact on users or operations. The summary should be concise (no more than five sentences), maintaining a technical tone suitable for a general audience of IT professionals. Use present tense and english language. Begin directly with the summary, avoiding any introductory or closing remarks. \\n\\n TEXT\", \"stream\": false\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "52dbbf30-0f6f-4032-81d7-1d42e319534e",
+            "colId": "1c2493d9-bd73-4cff-a0d8-4226eea26d0b",
+            "containerId": "",
+            "name": "Generate - Answer",
+            "url": "http://localhost:11434/api/generate",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2024-08-22T18:50:58.432Z",
+            "modified": "2024-08-22T19:20:25.330Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"model\": \"llama3.1\",\n  \"prompt\": \"The following text is an IT incident ticket. Summarize the steps required to resolve the issue, including any commands, programs, scripts, or configurations that can be helpfull. Present the solution as actionable steps that can be applied to solve the incident, focusing solely on the resolution process without referencing the original problem. The summary should be concise (no more than five sentences) and maintain a technical tone suitable for general application. Use present tense and english language. Begin directly with the summary, avoiding any introductory or closing remarks. \\n\\n TEXT\",\n  \"stream\": false\n}",
+                "form": []
+            }
+        }
+    ],
+    "ref": "XRWtxTphUGBjT1UbjvArN5jAAo5fvf0DPxnXxGRINrB8RBiYWtacjp-Q_8cJC7Kt-kSvp8uigLBZ7CJUgJ5EAA"
+}
