@@ -1,0 +1,159 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "thunder-collection_llama3.1-finetuned",
+    "collectionId": "0fa1607a-fd09-4aaa-88f3-e977cfcb700f",
+    "dateExported": "2024-08-23T10:56:16.637Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "1ad04832-2167-4495-9fb3-c46ccc79e720",
+            "colId": "0fa1607a-fd09-4aaa-88f3-e977cfcb700f",
+            "containerId": "",
+            "name": "Generate - Solve Incident (SAP trfc)",
+            "url": "{{base-url-generate}}",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2024-08-23T10:16:25.438Z",
+            "modified": "2024-08-23T10:54:42.237Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"model\": \"{{model-name}}\",\n  \"prompt\": \"Failure of outbound transactional RFC (tRFC) calls on SAP System P001 (Linux).\",\n  \"stream\": false\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "2f2f2dce-6295-46ef-ade9-754d2907c303",
+            "colId": "0fa1607a-fd09-4aaa-88f3-e977cfcb700f",
+            "containerId": "",
+            "name": "Generate - Solve Incident (MaxDB)",
+            "url": "{{base-url-generate}}",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2024-08-23T10:16:25.439Z",
+            "modified": "2024-08-23T10:54:58.731Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"model\": \"{{model-name}}\",\n  \"prompt\": \"A database (MaxDB) indicating high sessions usage (hosted on DB001).\",\n  \"stream\": false\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "844e2603-4243-46de-8478-3c157ba922f7",
+            "colId": "0fa1607a-fd09-4aaa-88f3-e977cfcb700f",
+            "containerId": "",
+            "name": "Generate - Solve Incident (Virus on Windows Server)",
+            "url": "{{base-url-generate}}",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2024-08-23T10:16:25.440Z",
+            "modified": "2024-08-23T10:55:00.800Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"model\": \"{{model-name}}\",\n  \"prompt\": \"A virus was found on WEB001 (Windows Server). How to deal with it?\",\n  \"stream\": false\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "c7277e17-0031-460f-b9ec-15c055b9e8a1",
+            "colId": "0fa1607a-fd09-4aaa-88f3-e977cfcb700f",
+            "containerId": "",
+            "name": "Generate - Solve Incident (SAP reorg jobs)",
+            "url": "{{base-url-generate}}",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2024-08-23T10:32:46.102Z",
+            "modified": "2024-08-23T10:54:54.432Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"model\": \"{{model-name}}\",\n  \"prompt\": \"To many reorg jobs on SAP001. Which tools can help me and provide information?\",\n  \"stream\": false\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "48e326a1-6df9-435c-9d4e-8d170b3d3bf4",
+            "colId": "0fa1607a-fd09-4aaa-88f3-e977cfcb700f",
+            "containerId": "",
+            "name": "Generate - Solve Incident (Change local Administrator Pwassword on Windows Server)",
+            "url": "{{base-url-generate}}",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2024-08-23T10:21:18.871Z",
+            "modified": "2024-08-23T10:55:03.320Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"model\": \"{{model-name}}\",\n  \"prompt\": \"Change local Administrator Password on Windows Server automaticly. How is the procedure?\",\n  \"stream\": false\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "a1409a58-c5f5-4c89-85a4-9508b75a6668",
+            "colId": "0fa1607a-fd09-4aaa-88f3-e977cfcb700f",
+            "containerId": "",
+            "name": "Generate - Solve Incident (Host is down)",
+            "url": "{{base-url-generate}}",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2024-08-23T10:39:06.583Z",
+            "modified": "2024-08-23T10:54:56.481Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"model\": \"{{model-name}}\",\n  \"prompt\": \"Host is down! Host SAP001 Linux. Do I can trigger and automatic procedure?\",\n  \"stream\": false\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "5e717f85-3cf2-40f6-9a4c-4e3c87722a7f",
+            "colId": "0fa1607a-fd09-4aaa-88f3-e977cfcb700f",
+            "containerId": "",
+            "name": "Generate - Solve Incident (Backup Workflow for HANA DB)",
+            "url": "{{base-url-generate}}",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2024-08-23T10:25:57.567Z",
+            "modified": "2024-08-23T10:55:05.323Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"model\": \"{{model-name}}\",\n  \"prompt\": \"Backup Workflow for HANA DB is failed. Which tool I need to contact?\",\n  \"stream\": false\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "0d8e308e-f657-4bdf-9de0-8a90e501dc5d",
+            "colId": "0fa1607a-fd09-4aaa-88f3-e977cfcb700f",
+            "containerId": "",
+            "name": "Generate - Solve Incident (current monitoring state)",
+            "url": "{{base-url-generate}}",
+            "method": "POST",
+            "sortNum": 50000,
+            "created": "2024-08-23T10:28:27.334Z",
+            "modified": "2024-08-23T10:55:07.146Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"model\": \"{{model-name}}\",\n  \"prompt\": \"I want to get the current monitoring state (cpu and ram usage) of the Host abc123001. Which monitoring tool I need to contact?\",\n  \"stream\": false\n}",
+                "form": []
+            }
+        }
+    ],
+    "settings": {
+        "preReq": {
+            "inlineScripts": [
+                {
+                    "script": [
+                        "tc.setVar(\"base-url-generate\", \"http://localhost:11434/api/generate\",\"request\");",
+                        "tc.setVar(\"model-name\", \"llama3.1-finetuned-2024-08-23\",\"request\");"
+                    ]
+                }
+            ]
+        }
+    },
+    "ref": "mBHqQq7N0jeAi9P_QDe_pm3izNGfeItbboBuV1k5pCNx_rtlq1rewiN8sm9RHBauYhk3_0xZUTZk15ZRJdfxqQ"
+}
