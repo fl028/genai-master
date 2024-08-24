@@ -59,9 +59,9 @@ Use Terraform to set up the required Azure infrastructure.
 
 4. **Setup GPU**:
 - check gpu: `sudo lspci | grep -i nvidia` or `sudo lshw -C display`
-- install NVIDIA drivers and CUDA toolkit - this should be installed via tf (https://learn.microsoft.com/en-us/azure/virtual-machines/linux/n-series-driver-setup)
+- install NVIDIA drivers and CUDA toolkit - this should be installed via tf [n-series-driver-setup](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/n-series-driver-setup)
 - check gpu drivers: `cat /proc/driver/nvidia/version` or `nvidia-smi`
-- install NVIDIA Container Toolkit - we have to install it manually (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt)
+- install NVIDIA Container Toolkit - we have to install it manually [container-toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt)
 - check gpu in container: `sudo systemctl restart docker && docker run --gpus all nvcr.io/nvidia/k8s/cuda-sample:nbody nbody -gpu -benchmark`
 
    
@@ -114,14 +114,11 @@ The raw data in the database can now be processed further. To do this, we need t
     "db-host": "genai-master-db.mysql.database.azure.com",
     "db-database": "data",
     "keywords": [
-        "____________________",
-        "------",
-        "*****",
-        "#####",
-        ">>>",
-        "<<<",
-        ....
-    ]
+        "..."
+    ],
+    "specific_terms": {
+        "...": "..."
+    }
 }`
 
 3. **Run python scripts**:
@@ -135,16 +132,28 @@ The raw data in the database can now be processed further. To do this, we need t
 - Open the Command Palette: select: `Dev Containers: Reopen in Container`
 - VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
 
-2. **Run python scripts**:
+2. **Setup config file**:
+- To get access to the ticket api and db we have to prepare a [config.json](code\ticket-presidio\config.json)
+- Fill the following content: `{
+    "db-user": "mysqladmin",
+    "db-password": "...",
+    "db-host": "genai-master-db.mysql.database.azure.com",
+    "db-database": "data",
+    "false_recognized_names": [
+        "..."
+    ]
+}`
+
+3. **Run python scripts**:
 - Run `python clean-pii.py` to remove pii contents.
 
-3. **Reopen in Container**:
+4. **Reopen in Container**:
 - Open the folder: `~/genai-master/code/ticket-ollama`
 - Open the Command Palette: select: `Dev Containers: Reopen in Container`
 - VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
 - In this container a local llm is hosted to summarize the incident data
 
-4. **Run python scripts**:
+5. **Run python scripts**:
 - Run `python check-tickets-summed.py` to check the db (table: tickets_texts) contents.
 - Run `python sum-tickets.py` to sum the tickets db (table: tickets_summary) contents.
 
@@ -154,6 +163,21 @@ The raw data in the database can now be processed further. To do this, we need t
 - Open the folder: `~/genai-master/code/ticket-review`
 - Open the Command Palette: select: `Dev Containers: Reopen in Container`
 - VS Code will start building the Docker container defined in the `.devcontainer` folder and reopen the project inside the container.
+
+2. **Setup config file**:
+- To get access to the ticket api and db we have to prepare a [config.json](code\ticket-review\config.json)
+- Fill the following content: `{
+    "db-user": "mysqladmin",
+    "db-password": "...",
+    "db-host": "genai-master-db.mysql.database.azure.com",
+    "db-database": "data",
+    "keywords": [
+        "..."
+    ],
+    "specific_terms": {
+        "...": "..."
+    }
+}`
 
 2. **Run python scripts**:
 - Run `python review-tickets.py` to scan the database an improve the quality manually.
@@ -191,3 +215,6 @@ Copy .gguf model to local devcontainer: `scp -i /workspaces/genai-master/infrast
 - Run `ollama create llama3.1-finetuned-time_stamp --file models/time_stamp/llama3.1-finetuned-time_stamp.modelfile`
 - Run `ollama run llama3.1-finetuned-time_stamp`
 - Run prompts via cli or rest api
+
+3. **Test model**:
+- Execute api calls: [thunder-collection](code\deploy-ollama\rest-api-tests\thunder-collection_llama3.1-finetuned.json)
