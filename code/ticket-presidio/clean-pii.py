@@ -3,63 +3,63 @@ import json
 import pandas as pd
 import mysql.connector
 from mysql.connector import Error
-from presidio_analyzer import AnalyzerEngine, RecognizerResult
-from presidio_anonymizer import AnonymizerEngine
-from transformers import pipeline
+import spacy
+import re
 
-analyzer = AnalyzerEngine()
-anonymizer = AnonymizerEngine()
+nlp = spacy.load("de_core_news_lg")
 
-transformer_nlp = pipeline(
-    "ner",
-    model="xlm-roberta-large-finetuned-conll03-english",
-    tokenizer="xlm-roberta-large-finetuned-conll03-english",
-    device=0
-)
+name_regex = re.compile(r'\b(?:[A-ZÄÖÜ][a-zäöüß]+(?:[-\' ][A-ZÄÖÜ][a-zäöüß]+)?)+\b')
 
-ANONYMIZE_ENTITY_TYPES = [
-    "PERSON", "EMAIL_ADDRESS", "PHONE_NUMBER", "DATE_TIME", "CREDIT_CARD", "IBAN_CODE", "IP_ADDRESS"
-]
+discard_patterns = re.compile(r'[^\w\säöüÄÖÜß\'-]|[_%$#@!&]')
 
-def analyze_with_transformer(text):
-    results = transformer_nlp(text)
-    presidio_results = []
-    for ent in results:
-        entity_type = ent['entity'].split("-")[-1]
-        if entity_type in ANONYMIZE_ENTITY_TYPES:
-            presidio_results.append(
-                RecognizerResult(
-                    entity_type=entity_type,
-                    start=ent['start'],
-                    end=ent['end'],
-                    score=ent['score']
-                )
-            )
-    return presidio_results
+def is_valid_name(name):
+    return bool(name_regex.fullmatch(name))
 
-def anonymize_pii(text):
-    print("anonymize_pii")
-    transformer_results = analyze_with_transformer(text)
-    analyzer_results = analyzer.analyze(
-        text=text, 
-        entities=ANONYMIZE_ENTITY_TYPES, 
-        language="en"
-    )
-    all_results = analyzer_results + transformer_results
-    anonymizer_results = [
-        RecognizerResult(
-            entity_type=result.entity_type,
-            start=result.start,
-            end=result.end,
-            score=result.score
-        )
-        for result in all_results
-        if result.entity_type in ANONYMIZE_ENTITY_TYPES
-    ]
-    anonymized_result = anonymizer.anonymize(text=text, analyzer_results=anonymizer_results)
-    anonymized_text = anonymized_result.text
+def is_discardable_name(name):
+    return bool(discard_patterns.search(name))
+
+def anonymize_pii(text, config):
+    doc = nlp(text)
+    anonymized_text = text
     
+    person_names = set()
+    discarded_names = set()
+    false_recognized_names = set(config.get("false_recognized_names", []))
+
+    for ent in doc.ents:
+        if ent.label_ == "PER":
+            name = ent.text
+            if is_discardable_name(name) or name in false_recognized_names:
+                discarded_names.add(name)
+            elif is_valid_name(name):
+                person_names.add(name)
+            else:
+                discarded_names.add(name)
+
+    if person_names:
+        print("Detected valid person names:")
+        for name in person_names:
+            print(f"- {name}")
+
+    if discarded_names:
+        print("Discarded names (containing special characters, false recognized, or not matching regex):")
+        for name in discarded_names:
+            print(f"- {name}")
+
+    # Replace valid person names with placeholders in the text
+    for name in person_names:
+        anonymized_text = anonymized_text.replace(name, "")
+
+    config.setdefault("valid_names", []).extend(person_names)
+    config.setdefault("discarded_names", []).extend(discarded_names)
+    config["valid_names"] = list(set(config["valid_names"]))
+    config["discarded_names"] = list(set(config["discarded_names"]))
+
     return anonymized_text
+
+def update_config_file(config, file_path):
+    with open(file_path, 'w') as file:
+        json.dump(config, file, indent=4)
 
 class DB:
     def __init__(self, config):
@@ -142,7 +142,8 @@ class DB:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
-    with open('config.json', 'r') as file:
+    config_file_path = 'config.json'
+    with open(config_file_path, 'r') as file:
         config = json.load(file)
 
     db = DB(config)
@@ -157,9 +158,9 @@ if __name__ == "__main__":
             ticket_df = db.read_ticket(ticket_id)
             if ticket_df is not None and not ticket_df.empty:
                 raw_text = ticket_df.loc[0, 'text']
-                cleaned_text = anonymize_pii(raw_text)
-                print(cleaned_text)
+                cleaned_text = anonymize_pii(raw_text, config)
                 db.insert_cleaned_text(ticket_id, cleaned_text)
+                update_config_file(config, config_file_path)
             else:
                 print(f"No data found for ticket ID {ticket_id}.")
         else:

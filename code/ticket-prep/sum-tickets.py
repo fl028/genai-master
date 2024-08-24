@@ -5,6 +5,7 @@ from mysql.connector import Error, IntegrityError
 import logging
 import pandas as pd
 import random
+import time
 
 class DB:
     def __init__(self, config):
@@ -131,6 +132,38 @@ class DB:
             if self.connection.is_connected():
                 cursor.close()
 
+    def read_ticket_category(self, ticket_id):
+        if self.connection is None:
+            print("No connection to the database.")
+            return 'Incident'
+        
+        query = "SELECT category FROM tickets WHERE id = %s;"
+        
+        category_mapping = {
+            'INC': 'Incident',
+            'SRQ': 'Request',
+            'RFC': 'Request',
+            'CHI': 'Request',
+            'CHR': 'Request'
+        }
+        
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(query, (ticket_id,))
+            category = cursor.fetchone()
+            
+            cursor.close()
+            
+            if category:
+                category_code = category[0]
+                return category_mapping.get(category_code, 'Incident')
+            else:
+                return 'Incident'
+        except Error as e:
+            print(f"Error: {e}")
+            return 'Incident'
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
@@ -146,30 +179,73 @@ if __name__ == "__main__":
     print(f"Cleaned ticket texts: {ticket_counter}")
 
     question_prompts = [
-        "The following text is an IT incident ticket. Please summarize the ticket by focusing on the issue, including the type, affected systems or components, potential causes, and the impact on users or operations. The summary should be concise (no more than five sentences), maintaining a technical tone suitable for a general audience of IT professionals. Use present tense and english language. Begin directly with the summary, avoiding any introductory or closing remarks.",
-        "The following text is an IT incident ticket. Please summarize the ticket by focusing on the issue. The summary should be concise (no more than four sentences), maintaining a technical tone suitable for a general audience of IT professionals. Use present tense and english language."
+        "The following text is an IT {CATEGORY} ticket. Please summarize the ticket by focusing on the issue, including the type, affected systems or components, potential causes, and the impact on users or operations. The summary should be concise (no more than five sentences), maintaining a technical tone suitable for a general audience of IT professionals. Use present tense and english language. Begin directly with the summary, avoiding any introductory or closing remarks.",
+        "The following text is an IT {CATEGORY} ticket. Please summarize the ticket by focusing on the issue. The summary should be concise (no more than four sentences), maintaining a technical tone suitable for a general audience of IT professionals. Use present tense and english language."
     ]
 
     answer_prompts = [
-        "The following text is an IT incident ticket. Summarize the steps required to resolve the issue, including any commands, programs, scripts, or configurations that can be helpful. Present the solution as actionable steps that can be applied to solve the incident, focusing solely on the resolution process without referencing the original problem. The summary should be concise (no more than five sentences) and maintain a technical tone suitable for general application. Use present tense and english language. Begin directly with the summary, avoiding any introductory or closing remarks.",
-        "The following text is an IT incident ticket. Summarize the steps required to resolve the issue, including any step and hint that can be helpful. Present the solution as actionable steps without referencing the original problem. The summary should be concise (no more than four sentences). Use present tense and english language."
+        "The following text is an IT {CATEGORY} ticket. Summarize the steps required to resolve the issue, including any commands, programs, scripts, or configurations that can be helpful. Present the solution as actionable steps that can be applied to solve the incident, focusing solely on the resolution process without referencing the original problem. The summary should be concise (no more than five sentences) and maintain a technical tone suitable for general application. Use present tense and english language. Begin directly with the summary, avoiding any introductory or closing remarks.",
+        "The following text is an IT {CATEGORY} ticket. Summarize the steps required to resolve the issue, including any step and hints that can be helpful. Present the solution as actionable steps without referencing the original problem. The summary should be concise (no more than four sentences). Use present tense and english language."
     ]
 
-    timeout_seconds = 5  # Timeout for API call
+    def trim_text(text, max_length=2048):
+        """Trims the text to the maximum allowed length without cutting off words."""
+        if len(text) > max_length:
+            split_pos = text.rfind(' ', 0, max_length)  # Try to trim at the last space before max_length
+            if split_pos == -1:
+                split_pos = max_length  # If no space found, trim at max_length
+            return text[:split_pos].strip()
+        return text
 
-    def make_api_call(url, headers, body):
-        """Helper function to perform API call with retry logic for timeout."""
-        while True:
+    def make_api_call(url, headers, body, max_retries=3, timeout_seconds=5):
+        retries = 0
+        while retries < max_retries:
             try:
                 response = requests.post(url, headers=headers, data=json.dumps(body), timeout=timeout_seconds)
                 if response.status_code == 200:
-                    return response.json()['response']
+                    return response.json().get('response', None), True
+                elif response.status_code == 500:
+                    print(f"Server error (500). Retry {retries + 1}/{max_retries}...")
+                    return None, False  # Indicate that a 500 error occurred
                 else:
-                    print("Failed to call API. Status code:", response.status_code)
+                    print(f"Failed to call API. Status code: {response.status_code}")
                     print("Response:", response.text)
-                    return None
+                    break 
             except requests.exceptions.Timeout:
-                print("API call timed out. Retrying...")
+                print(f"API call timed out. Retry {retries + 1}/{max_retries}...")
+            
+            retries += 1
+            sleep_time = timeout_seconds * (2 ** retries)
+            print(f"Sleeping for {sleep_time} seconds before retrying...")
+            time.sleep(sleep_time)
+
+        print("Exceeded maximum retries. Skipping this request.")
+        return None, False
+
+    def process_ticket(url, headers, prompt, cleaned_text, model="llama3.1", max_length=2048):
+        body = {
+            "model": model,
+            "prompt": prompt + "\n\n" + cleaned_text,
+            "stream": False
+        }
+        
+        response, success = make_api_call(url, headers, body)
+        
+        if not success:
+            trimmed_text = trim_text(cleaned_text, max_length)
+            print(f"Retrying with trimmed text ({len(trimmed_text)} characters)...")
+            
+            body = {
+                "model": model,
+                "prompt": prompt + "\n\n" + trimmed_text,
+                "stream": False
+            }
+            
+            response, success = make_api_call(url, headers, body)
+        
+        return response
+
+
 
     for counter in range(ticket_counter):
         if not db.check_ticket_exists_in_tickets_summary(ticket_id):
@@ -178,8 +254,12 @@ if __name__ == "__main__":
                 ticket_df = db.read_cleaned_ticket(ticket_id)
                 if not ticket_df.empty:
                     cleaned_text = ticket_df.loc[0, 'text']
-                   
+
+                    ticket_category = db.read_ticket_category(ticket_id)
+
                     # Select random prompts
+                    question_prompts = [p.format(CATEGORY=ticket_category) for p in question_prompts]
+                    answer_prompts = [p.format(CATEGORY=ticket_category) for p in answer_prompts]
                     question_prompt = random.choice(question_prompts)
                     answer_prompt = random.choice(answer_prompts)
 
@@ -190,26 +270,14 @@ if __name__ == "__main__":
                     }
 
                     # API call for question
-                    body_question = {
-                        "model": "llama3.1",
-                        "prompt": question_prompt + "\n\n" + cleaned_text,
-                        "stream": False
-                    }
-
-                    question = make_api_call(url, headers, body_question)
+                    question = process_ticket(url, headers, question_prompt, cleaned_text)
                     if not question:
                         continue  # Skip to next ticket if API call fails
 
                     print("question: " + question)
 
                     # API call for answer
-                    body_answer = {
-                        "model": "llama3.1",
-                        "prompt": answer_prompt + "\n\n" + cleaned_text,
-                        "stream": False
-                    }
-
-                    answer = make_api_call(url, headers, body_answer)
+                    answer = process_ticket(url, headers, answer_prompt, cleaned_text)
                     if not answer:
                         continue  # Skip to next ticket if API call fails
 

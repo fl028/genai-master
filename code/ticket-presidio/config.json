@@ -2,5 +2,20 @@
     "db-user": "mysqladmin",
     "db-password": "...",
     "db-host": "genai-master-db.mysql.database.azure.com",
-    "db-database": "data"
+    "db-database": "data",
+    "false_recognized_names": [
+        "Crontab",
+        "Best Regards",
+        "Servicedesk",
+        "Any",
+        "Hello",
+        "Docs",
+        "Completed",
+        "Key",
+        "Link",
+        "String",
+        "Hi",
+        "Canceled",
+        "Msg"
+    ]
 }

@@ -1,4 +1,3 @@
 mysql-connector-python
 pandas
-presidio_analyzer[transformers]
-presidio_anonymizer
+spacy

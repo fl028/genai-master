@@ -57,7 +57,7 @@ def contains_date(line):
     return bool(date_pattern.search(line))
 
 def starts_with_keyword(line, keywords):
-    return any(line.startswith(keyword) for keyword in keywords)
+    return any(line.strip().startswith(keyword) for keyword in keywords)
 
 def is_empty_line(line):
     return not line.strip()
@@ -213,6 +213,41 @@ class DB:
         except Error as e:
             print(f"Error: {e}")
             return None
+        
+    def read_ticket_category(self, ticket_id):
+        if self.connection is None:
+            print("No connection to the database.")
+            return None
+        
+        query = "SELECT category FROM tickets WHERE id = %s;"
+        
+        # Define the category mapping
+        category_mapping = {
+            'INC': 'Incident',
+            'SRQ': 'Request',
+            'RFC': 'Request',
+            'CHI': 'Request',
+            'CHR': 'Request'
+        }
+        
+        try:
+            cursor = self.connection.cursor()
+            cursor.execute(query, (ticket_id,))
+            category = cursor.fetchone()
+            
+            cursor.close()
+            
+            if category:
+                # Get the actual category code
+                category_code = category[0]
+                # Map the category code to the descriptive name
+                return category_mapping.get(category_code, 'Unknown Category')
+            else:
+                return None
+        except Error as e:
+            print(f"Error: {e}")
+            return None
+
 
 
 if __name__ == "__main__":
@@ -250,13 +285,15 @@ if __name__ == "__main__":
             ticket_df = db.read_ticket(ticket_id)
             if not ticket_df.empty:
                 title = db.read_ticket_title(ticket_id)
+                category = db.read_ticket_category(ticket_id)
                 raw_text = ticket_df.loc[0, 'text']
-                cleaned_text = clean_text(raw_text, line_conditions, word_conditions, keywords, specific_terms)
                 
-                if title:
-                    # Prepend the title to the cleaned text
-                    cleaned_text = f"Title: {title}\n\n{cleaned_text}"
-                    
+                if category and title:
+                    # Prepend the category and title to the cleaned text
+                    raw_text = f"{category}\nTitle: {title}\n\n{raw_text}"
+
+                cleaned_text = clean_text(raw_text, line_conditions, word_conditions, keywords, specific_terms)
+
                 db.insert_cleaned_text(ticket_id, cleaned_text)
         else:
             print(f"Ticket ID {ticket_id} already exists in tickets_texts.")
