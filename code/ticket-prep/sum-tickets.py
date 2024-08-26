@@ -185,15 +185,14 @@ if __name__ == "__main__":
         "The following text is an IT {CATEGORY} ticket. Summarize the steps required to resolve the issue, including any step and hints that can be helpful. Present the solution as actionable steps without referencing the original problem. The summary should be concise (no more than four sentences). Use present tense and english language."
     ]
 
-    trim_keywords =  [
+    trim_keywords = [
         "**Summary**",
-        "Here is"
+        "Here",
         "Here's",
         "Incident Summary",
-        "Issue summary",
         "Issue summary"
     ]
-
+    
     retry_keywords = [
         "Der",
         "Die",
@@ -208,7 +207,8 @@ if __name__ == "__main__":
         "Keine",
         "Ich",
         "Frau",
-        "I can"
+        "I'll work",
+        "I can",
         "I can't",
         "I don't",
         "Lo siento",
@@ -225,7 +225,7 @@ if __name__ == "__main__":
         return '\n'.join(lines).strip()
 
     def should_retry(response, retry_keywords):
-        lines = response.split('\n')
+        lines = response.split('\n', 1)
         first_line = lines[0].strip() if lines else ""
         return any(first_line.startswith(keyword) for keyword in retry_keywords)
 
