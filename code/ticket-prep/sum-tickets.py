@@ -5,7 +5,6 @@ from mysql.connector import Error, IntegrityError
 import logging
 import pandas as pd
 import random
-import time
 
 class DB:
     def __init__(self, config):
@@ -114,7 +113,6 @@ class DB:
             print(f"Error: {e}")
             return None
         
-
     def insert_summed_text(self, ticket_id, question, answer):
         try:
             if self.connection.is_connected():
@@ -140,11 +138,11 @@ class DB:
         query = "SELECT category FROM tickets WHERE id = %s;"
         
         category_mapping = {
-            'INC': 'Incident',
-            'SRQ': 'Request',
-            'RFC': 'Request',
-            'CHI': 'Request',
-            'CHR': 'Request'
+            'INC': 'incident',
+            'SRQ': 'request',
+            'RFC': 'request',
+            'CHI': 'request',
+            'CHR': 'request'
         }
         
         try:
@@ -162,7 +160,6 @@ class DB:
         except Error as e:
             print(f"Error: {e}")
             return 'Incident'
-
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
@@ -188,68 +185,107 @@ if __name__ == "__main__":
         "The following text is an IT {CATEGORY} ticket. Summarize the steps required to resolve the issue, including any step and hints that can be helpful. Present the solution as actionable steps without referencing the original problem. The summary should be concise (no more than four sentences). Use present tense and english language."
     ]
 
-    def trim_text(text, max_length=2048):
-        """Trims the text to the maximum allowed length without cutting off words."""
-        if len(text) > max_length:
-            split_pos = text.rfind(' ', 0, max_length)  # Try to trim at the last space before max_length
-            if split_pos == -1:
-                split_pos = max_length  # If no space found, trim at max_length
-            return text[:split_pos].strip()
-        return text
+    trim_keywords =  [
+        "**Summary**",
+        "Here is"
+        "Here's",
+        "Incident Summary",
+        "Issue summary",
+        "Issue summary"
+    ]
 
-    def make_api_call(url, headers, body, max_retries=3, timeout_seconds=5):
+    retry_keywords = [
+        "Der",
+        "Die",
+        "Das",
+        "Eine",
+        "Ein",
+        "Entschuldigung",
+        "Entspricht",
+        "Es",
+        "Hallo",
+        "Hier",
+        "Keine",
+        "Ich",
+        "Frau",
+        "I can"
+        "I can't",
+        "I don't",
+        "Lo siento",
+        "No issue",
+        "No IT",
+        "Unfortunately"
+    ]
+
+    def trim_response(response, trim_keywords):
+        lines = response.split('\n')
+        first_line = lines[0].strip()
+        if any(first_line.startswith(keyword) for keyword in trim_keywords):
+            lines.pop(0)
+        return '\n'.join(lines).strip()
+
+    def should_retry(response, retry_keywords):
+        lines = response.split('\n')
+        first_line = lines[0].strip() if lines else ""
+        return any(first_line.startswith(keyword) for keyword in retry_keywords)
+
+    def make_api_call(url, headers, body, max_retries=5):
         retries = 0
+        use_large_context = False
+
         while retries < max_retries:
             try:
-                response = requests.post(url, headers=headers, data=json.dumps(body), timeout=timeout_seconds)
+                if use_large_context:
+                    body["options"] = {"num_ctx": 16384}  # Use increased context
+
+                response = requests.post(url, headers=headers, data=json.dumps(body))
                 if response.status_code == 200:
-                    return response.json().get('response', None), True
+                    api_response = response.json().get('response', None)
+                    
+                    if should_retry(api_response, retry_keywords):
+                        print(f"Retrying API call due to unwanted start ...")
+                        retries += 1
+                        use_large_context = True  # Ensure larger context is used on retry
+                        continue
+                    
+                    trimmed_response = trim_response(api_response, trim_keywords)
+                    return trimmed_response, True
                 elif response.status_code == 500:
-                    print(f"Server error (500). Retry {retries + 1}/{max_retries}...")
-                    return None, False  # Indicate that a 500 error occurred
+                    print(f"Failed to call API. Status code: {response.status_code}")
+                    print("Response:", response.text)
+                    print(f"Server error (500). Retry {retries + 1}/{max_retries} with increased context...")
+                    use_large_context = True  # Switch to larger context on server error
                 else:
                     print(f"Failed to call API. Status code: {response.status_code}")
                     print("Response:", response.text)
-                    break 
-            except requests.exceptions.Timeout:
-                print(f"API call timed out. Retry {retries + 1}/{max_retries}...")
+                    break
+            except requests.exceptions.RequestException as e:
+                print(f"API request failed: {e}")
+                break
             
             retries += 1
-            sleep_time = timeout_seconds * (2 ** retries)
-            print(f"Sleeping for {sleep_time} seconds before retrying...")
-            time.sleep(sleep_time)
 
         print("Exceeded maximum retries. Skipping this request.")
         return None, False
 
-    def process_ticket(url, headers, prompt, cleaned_text, model="llama3.1", max_length=2048):
+    def process_ticket(url, headers, prompt, cleaned_text, model="llama3.1"):
         body = {
             "model": model,
             "prompt": prompt + "\n\n" + cleaned_text,
-            "stream": False
+            "stream": False,
+            "options": {"num_ctx": 4096}  # Default context size
         }
         
         response, success = make_api_call(url, headers, body)
         
         if not success:
-            trimmed_text = trim_text(cleaned_text, max_length)
-            print(f"Retrying with trimmed text ({len(trimmed_text)} characters)...")
-            
-            body = {
-                "model": model,
-                "prompt": prompt + "\n\n" + trimmed_text,
-                "stream": False
-            }
-            
             response, success = make_api_call(url, headers, body)
         
         return response
 
-
-
     for counter in range(ticket_counter):
         if not db.check_ticket_exists_in_tickets_summary(ticket_id):
-            print(f"Process: {ticket_id}")
+            print(f"### Process: {ticket_id} ###")
             if db.check_ticket_exists_in_tickets_texts(ticket_id):
                 ticket_df = db.read_cleaned_ticket(ticket_id)
                 if not ticket_df.empty:
