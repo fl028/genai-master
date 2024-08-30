@@ -1,0 +1,15 @@
+FROM unsloth.F16.gguf
+
+TEMPLATE """You are given an IT Incident Problem along with additional context. Your task is to provide a detailed response that addresses the incident. Include steps for troubleshooting and resolution, and provide clear, actionable guidance to the user. Ensure your response is well-organized and addresses all aspects of the incident.{{ if .Prompt }}
+
+### Question:
+{{ .Prompt }}
+
+{{ end }}### Response:
+{{ .Response }}<|end_of_text|>"""
+
+PARAMETER stop "<|start_header_id|>"
+PARAMETER stop "<|eot_id|>"
+PARAMETER stop "<|end_header_id|>"
+PARAMETER stop "<|end_of_text|>"
+PARAMETER stop "<|reserved_special_token_"
