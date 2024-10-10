@@ -277,9 +277,10 @@ if __name__ == "__main__":
         }
         
         response, success = make_api_call(url, headers, body)
-        
+    
         if not success:
-            response, success = make_api_call(url, headers, body)
+            print(f"Skipping ticket {ticket_id} due to API call failure.")
+            return None  # Skip processing and don't retry further
         
         return response
 
