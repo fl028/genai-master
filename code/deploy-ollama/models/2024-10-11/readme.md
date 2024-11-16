@@ -3,4 +3,4 @@
 - time for the summary per record entry (sum-tickets.py) 19h
 - adapted parameters 83 Mio
 - training time (training.py) 14h
-- azure costs up to then ?€
+- azure costs up to then 376€
