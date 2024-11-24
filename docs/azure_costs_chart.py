@@ -17,7 +17,7 @@ model.fit(dataset_sizes, costs)
 slope = model.coef_[0]
 intercept = model.intercept_
 
-function_str = f"Cost Prediction: y = {slope:.4f}x + {intercept:.2f}"
+function_str = f"Kostenfunktion: y = {slope:.4f}x + {intercept:.2f}"
 
 extended_sizes = np.linspace(10000, 50000, 500).reshape(-1, 1) 
 predicted_costs = model.predict(extended_sizes)
@@ -27,9 +27,9 @@ plt.scatter(dataset_sizes, costs, color='blue', s=50, label='Measured Data')
 plt.plot(extended_sizes, predicted_costs, color='black', linewidth=1, label='Trend Line')
 
 # titles and labels
-plt.title('Azure Costs vs Dataset Size', fontsize=14)
-plt.xlabel('Dataset Size (rows)', fontsize=12)
-plt.ylabel('Costs (€)', fontsize=12)
+plt.title('Infrastrukturkosten in Bezug zur Datensatzgröße', fontsize=14)
+plt.xlabel('Datensatzgröße (Incidents)', fontsize=12)
+plt.ylabel('Kosten (€)', fontsize=12)
 plt.grid(True, linestyle='--', alpha=0.7)
 
 # cost prediction function
